@@ -1,0 +1,872 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package GUI;
+
+import BUS.chitietphieuBUS;
+import BUS.docgiaBUS;
+import BUS.nhanvienBUS;
+import BUS.phieumuontraBUS;
+import BUS.sachBUS;
+import DTO.chitietphieuDTO;
+import DTO.docgiaDTO;
+import DTO.nhanvienDTO;
+import DTO.phieumuontraDTO;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import interfaces.InChangePanelDeal;
+import interfaces.InDocGiaSelect;
+import interfaces.InNhanVienSelect;
+import interfaces.QueryCallBack;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+import untils.CheckData;
+import untils.DateLabelFormatter;
+import untils.OutFile;
+import untils.cons;
+
+/**
+ *
+ * @author Admin
+ */
+public class PanelLoanSlip extends javax.swing.JPanel implements QueryCallBack, InDocGiaSelect, InNhanVienSelect {
+
+    DefaultTableModel dtm;
+    ArrayList<phieumuontraDTO> arr = new ArrayList<>();
+    JDatePickerImpl datePicker;
+    JDatePickerImpl datePicker2;
+    JDatePickerImpl datePickerngaymuon;
+    UtilDateModel model = new UtilDateModel();
+    UtilDateModel model2 = new UtilDateModel();
+    UtilDateModel modengaymuon = new UtilDateModel();
+    Panelchoosedocgia panelDg;
+    Panelchoosenhanvien panelNv;
+    InChangePanelDeal inChangePanelDeal;
+
+    phieumuontraDTO current = new phieumuontraDTO();
+
+    public PanelLoanSlip(InChangePanelDeal inChangePanelDeal) {
+        initComponents();
+        this.inChangePanelDeal = inChangePanelDeal;
+        buttonAdddocgia.setVisible(false);
+        buttonAddnhanvien.setVisible(false);
+//        jButton13.setVisible(false);
+
+        panelDg = new Panelchoosedocgia(this);
+        panelDg.setBackground(new java.awt.Color(102, 102, 102));
+        panelDg.setForeground(new java.awt.Color(0, 204, 204));
+        panelDg.setLayout(null);
+        panelDg.setBounds(0, 0, 1024, 768);
+        panelDg.setVisible(false);
+        add(panelDg);
+
+        panelNv = new Panelchoosenhanvien(this);
+        panelNv.setBackground(new java.awt.Color(102, 102, 102));
+        panelNv.setForeground(new java.awt.Color(0, 204, 204));
+        panelNv.setLayout(null);
+        panelNv.setBounds(0, 0, 1024, 768);
+        panelNv.setVisible(false);
+        add(panelNv);
+
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePanelImpl datePane2 = new JDatePanelImpl(model2, p);
+        JDatePanelImpl datePanengaymuon = new JDatePanelImpl(modengaymuon, p);
+
+        datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        datePicker.setBounds(10, 130, 120, 25);
+        jPanel2.add(datePicker);
+
+        datePicker2 = new JDatePickerImpl(datePane2, new DateLabelFormatter());
+        datePicker2.setBounds(280, 130, 120, 25);
+        jPanel2.add(datePicker2);
+
+        datePickerngaymuon = new JDatePickerImpl(datePanengaymuon, new DateLabelFormatter());
+        datePickerngaymuon.setBounds(761, 10, 20, 25);
+        jPanel2.add(datePickerngaymuon);
+        datePickerngaymuon.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                Date today = new Date();
+                today.getTime();
+                if (modengaymuon.getValue().before(today)) {
+                    tfngaymuon.setText(new SimpleDateFormat("yyyy-MM-dd").format(modengaymuon.getValue()));
+                } else {
+                    tfngaymuon.setText(new SimpleDateFormat("yyyy-MM-dd").format(today));
+                }
+            }
+        });
+        loadPhieuMuon();
+        initData();
+        initEvent();
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new javax.swing.JPanel();
+        jButton11 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        tfmuontra = new javax.swing.JTextField();
+        tfdocgia = new javax.swing.JTextField();
+        tfnv = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        tfngaymuon = new javax.swing.JTextField();
+        tfghichu = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<String>();
+        jTextField7 = new javax.swing.JTextField();
+        jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jTextField8 = new javax.swing.JTextField();
+        jButton14 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField9 = new javax.swing.JTextField();
+        jButton15 = new javax.swing.JButton();
+        buttonAdddocgia = new javax.swing.JButton();
+        buttonAddnhanvien = new javax.swing.JButton();
+        buttonThemChiTiet = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
+
+        jPanel2.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel2.setLayout(null);
+
+        jButton11.setText("Mã Mượn Trả");
+        jPanel2.add(jButton11);
+        jButton11.setBounds(10, 10, 130, 25);
+
+        jButton1.setText("Độc Giả");
+        jPanel2.add(jButton1);
+        jButton1.setBounds(10, 45, 130, 25);
+
+        jButton2.setText("Nhân Viên");
+        jPanel2.add(jButton2);
+        jButton2.setBounds(10, 80, 130, 25);
+        jPanel2.add(tfmuontra);
+        tfmuontra.setBounds(146, 10, 212, 25);
+        jPanel2.add(tfdocgia);
+        tfdocgia.setBounds(146, 45, 212, 25);
+
+        tfnv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfnvActionPerformed(evt);
+            }
+        });
+        jPanel2.add(tfnv);
+        tfnv.setBounds(146, 80, 212, 25);
+
+        jButton3.setText("Ngày Mượn");
+        jPanel2.add(jButton3);
+        jButton3.setBounds(403, 10, 130, 25);
+
+        jButton5.setText("Ghi Chú");
+        jPanel2.add(jButton5);
+        jButton5.setBounds(403, 80, 130, 25);
+        jPanel2.add(tfngaymuon);
+        tfngaymuon.setBounds(539, 10, 222, 25);
+        jPanel2.add(tfghichu);
+        tfghichu.setBounds(539, 80, 222, 25);
+
+        jButton6.setText("Thêm");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton6);
+        jButton6.setBounds(799, 11, 170, 50);
+
+        jButton7.setText("Xóa");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton7);
+        jButton7.setBounds(799, 70, 170, 50);
+
+        jButton8.setText("Sửa");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton8);
+        jButton8.setBounds(799, 174, 170, 50);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Mã Mượn Trả", "Đọc Giả", "Nhân Viên", "Ngày Mượn", "Ghi Chú" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jComboBox1);
+        jComboBox1.setBounds(10, 228, 120, 30);
+        jPanel2.add(jTextField7);
+        jTextField7.setBounds(140, 228, 320, 30);
+
+        jButton9.setText("Tìm Kiếm");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton9);
+        jButton9.setBounds(470, 228, 100, 30);
+
+        jButton10.setText("Back");
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton10);
+        jButton10.setBounds(909, 235, 60, 23);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jTable1.setRowHeight(40);
+        jTable1.setRowMargin(10);
+        jScrollPane1.setViewportView(jTable1);
+
+        jPanel2.add(jScrollPane1);
+        jScrollPane1.setBounds(10, 264, 959, 402);
+
+        jLabel1.setText("Từ");
+
+        jButton14.setText("jButton14");
+
+        jLabel2.setText("Đến");
+
+        jButton15.setText("jButton15");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addGap(5, 5, 5)
+                .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(100, 100, 100)
+                .addComponent(jLabel2)
+                .addGap(5, 5, 5)
+                .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel2.add(jPanel1);
+        jPanel1.setBounds(10, 180, 393, 30);
+
+        buttonAdddocgia.setText("jButton13");
+        buttonAdddocgia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAdddocgiaActionPerformed(evt);
+            }
+        });
+        jPanel2.add(buttonAdddocgia);
+        buttonAdddocgia.setBounds(364, 45, 20, 25);
+
+        buttonAddnhanvien.setText("jButton13");
+        buttonAddnhanvien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAddnhanvienActionPerformed(evt);
+            }
+        });
+        jPanel2.add(buttonAddnhanvien);
+        buttonAddnhanvien.setBounds(364, 80, 20, 25);
+
+        buttonThemChiTiet.setText("Thêm Chi Tiết");
+        buttonThemChiTiet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonThemChiTietActionPerformed(evt);
+            }
+        });
+        jPanel2.add(buttonThemChiTiet);
+        buttonThemChiTiet.setBounds(410, 120, 148, 57);
+
+        jButton4.setText("Xuất Excel");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton4);
+        jButton4.setBounds(670, 110, 100, 23);
+
+        jButton12.setText("Xuất PDF ");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton12);
+        jButton12.setBounds(670, 150, 100, 23);
+
+        jButton13.setText("Đọc Excel");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton13);
+        jButton13.setBounds(670, 190, 100, 23);
+
+        jButton16.setText("Lưu ĐTB");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton16);
+        jButton16.setBounds(670, 230, 100, 23);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        // TODO add your handling code here:
+
+        String[] header = {"Mã Mượn Trả", "Đọc Giả", "Nhân Viên", "Ngày Mượn", "Ghi Chú"};
+        DefaultTableModel dtmsearch = new DefaultTableModel(header, 0);
+        ArrayList<phieumuontraDTO> s;
+        if (jComboBox1.getSelectedItem().equals("Ngày Mượn")) {
+            s = phieumuontraBUS.timkiemphieuNM(model.getValue(), model2.getValue());
+        } else {
+            if (jComboBox1.getSelectedItem().equals("Ngày Mượn")) {
+                if (CheckData.checkNumber(jTextField7.getText().toString().trim())) {
+                    s = phieumuontraBUS.timkiemPhieuMuonTra(String.valueOf(jComboBox1.getSelectedItem()), jTextField7.getText().toLowerCase().trim());
+                } else {
+                    JOptionPane.showMessageDialog(null, "Bạn phải nhập số!");
+                }
+            }
+            s = phieumuontraBUS.timkiemPhieuMuonTra(String.valueOf(jComboBox1.getSelectedItem()), jTextField7.getText().toLowerCase().trim());
+        }
+        if (s.size() != 0) {
+            phieumuontraDTO pmt = new phieumuontraDTO();
+            for (int i = 0; i < s.size(); i++) {
+                pmt = s.get(i);
+                String mamt = pmt.getMaMuonTra();
+                String madg = pmt.getMaDocGia();
+                String tendg = docgiaBUS.getTenDocGia(madg);
+                s.get(i).setTenDocGia(tendg);
+                String manv = pmt.getMaNhanVien();
+                String tennv = nhanvienBUS.getTenNhanVien(manv);
+                s.get(i).setTenNhanVien(tennv);
+
+                Date ngaymuon = pmt.getNgayMuon();
+//            Date ngayhentra = pmt.getNgayTra();
+                String ghichu = pmt.getGhiChu();
+//            System.out.println("ngày hẹn trả" + ngayhentra);
+                Object[] row = {mamt, tendg, tennv, ngaymuon, ghichu};
+                dtmsearch.addRow(row);
+            }
+            jTable1.setModel(dtmsearch);
+            setView(s.get(0));
+            jButton10.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Không có kết quả phù hợp!");
+        }
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        // TODO add your handling code here:
+        jTable1.setModel(dtm);
+        jButton10.setVisible(false);
+    }//GEN-LAST:event_jButton10ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        phieumuontraBUS.xoaPhieuMuonTra(tfmuontra.getText().toString().trim(), this);
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        if (jButton8.getText().toString().equals("Sửa")) {
+            tfmuontra.setEditable(true);
+            jButton6.setVisible(false);
+            jButton7.setVisible(false);
+            buttonThemChiTiet.setVisible(true);
+            buttonAdddocgia.setVisible(true);
+//        buttonAddnhanvien.setVisible(true);
+            datePickerngaymuon.setVisible(true);
+//        jButton13.setVisible(true);
+
+            jButton8.setText("Xác nhận sửa");
+
+        } else {
+            if (tfdocgia.getText().length() == 0 || tfnv.getText().length() == 0 || tfngaymuon.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Vui lòng điền đủ thông tin vào bảng");
+            } else {
+                tfghichu.setEnabled(false);
+                jButton6.setVisible(true);
+                jButton7.setVisible(true);
+                buttonThemChiTiet.setVisible(false);
+                buttonAdddocgia.setVisible(false);
+                buttonAddnhanvien.setVisible(false);
+                datePickerngaymuon.setVisible(false);
+//            tfmuontra.setEditable(true);
+
+                jButton8.setText("Sửa");
+                phieumuontraDTO ctp = new phieumuontraDTO();
+                ctp.setMaMuonTra(tfmuontra.getText().trim());
+                ctp.setMaDocGia(current.getMaDocGia());
+                ctp.setMaNhanVien(current.getMaNhanVien());
+                Date date1 = null, date2 = null;
+                try {
+                    date1 = new SimpleDateFormat("yyyy-MM-dd").parse(tfngaymuon.getText().trim());
+//               date2 = new SimpleDateFormat("dd/MM/yyyy").parse(jTextField5.getText().trim());
+                } catch (ParseException ex) {
+                    Logger.getLogger(PanelLoanSlipDetails.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ctp.setNgayMuon(date1);
+                phieumuontraBUS.suaPhieuMuonTra(ctp, this);
+            }
+        }
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        if (jButton6.getText().toString().equals("Thêm")) {
+            tfghichu.setEnabled(true);
+            buttonThemChiTiet.setVisible(true);
+            buttonAdddocgia.setVisible(true);
+
+            jButton7.setVisible(false);
+            jButton8.setVisible(false);
+//        buttonAddnhanvien.setVisible(true);
+            datePickerngaymuon.setVisible(true);
+//        jButton13.setVisible(true);
+            ArrayList<phieumuontraDTO> arr = phieumuontraBUS.getPhieuMuonTra();
+            tfmuontra.setText("" + (Integer.parseInt(arr.get(arr.size() - 1).getMaMuonTra()) + 1));
+            jButton6.setText("Xác nhận thêm");
+            jButton1.setText("Mã Đọc Giả");
+            jButton2.setText("Mã Nhân Viên");
+            tfdocgia.setText("");
+            tfnv.setText(current.getTenNhanVien());
+            Date today = new Date();
+            today.getTime();
+            tfngaymuon.setText(new SimpleDateFormat("yyyy-MM-dd").format(today));
+//        jTextField5.setText("");
+        } else {
+            ArrayList<chitietphieuDTO> a = chitietphieuBUS.timkiemChiTietPhieu("Mã Mượn Trả", tfmuontra.getText().trim());
+            if (tfdocgia.getText().length() == 0 || tfnv.getText().length() == 0 || tfngaymuon.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Vui lòng điền đủ thông tin vào bảng");
+            } else if (a.size() == 0) {
+                JOptionPane.showMessageDialog(null, "Bạn chưa tạo chi tiết cho phiếu mượn này");
+            } else {
+                tfghichu.setEnabled(false);
+                jButton6.setVisible(true);
+                jButton7.setVisible(true);
+                buttonThemChiTiet.setVisible(false);
+
+                buttonAdddocgia.setVisible(false);
+                buttonAddnhanvien.setVisible(false);
+                datePickerngaymuon.setVisible(false);
+                jButton6.setText("Thêm");
+                jButton1.setText("Đọc Giả");
+                jButton2.setText("Nhân Viên");
+                phieumuontraDTO ctp = new phieumuontraDTO();
+                ctp.setMaMuonTra(tfmuontra.getText().trim());
+                ctp.setMaDocGia(current.getMaDocGia());
+                ctp.setMaNhanVien(current.getMaNhanVien());
+                Date date1 = null, date2 = null;
+                try {
+                    date1 = new SimpleDateFormat("yyyy-MM-dd").parse(tfngaymuon.getText().trim());
+//               date2 = new SimpleDateFormat("dd/MM/yyyy").parse(jTextField5.getText().trim());
+                } catch (ParseException ex) {
+                    Logger.getLogger(PanelLoanSlipDetails.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                ctp.setNgayMuon(date1);
+//            ctp.setNgayTra(date2);
+                phieumuontraBUS.themPhieuMuonTra(ctp, this);
+            }
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void buttonAdddocgiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAdddocgiaActionPerformed
+        // TODO add your handling code here:
+        jPanel2.setVisible(false);
+        panelDg.setVisible(true);
+        revalidate();
+    }//GEN-LAST:event_buttonAdddocgiaActionPerformed
+
+    private void buttonAddnhanvienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddnhanvienActionPerformed
+        // TODO add your handling code here:
+        jPanel2.setVisible(false);
+        panelNv.setVisible(true);
+        revalidate();
+    }//GEN-LAST:event_buttonAddnhanvienActionPerformed
+
+    private void tfnvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfnvActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfnvActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        try {
+            OutFile.writeExcel(jTable1, "system\\file\\excel\\phieumuon\\", true);
+        } catch (IOException ex) {
+            Logger.getLogger(PanelBook.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        Document document = new Document();
+
+        try {
+            // khởi tạo một PdfWriter truyền vào document và FileOutputStream
+            PdfWriter.getInstance(document, new FileOutputStream(OutFile.createFilePDF("system\\file\\pdf\\phieumuon\\")));
+
+            // mở file để thực hiện viết
+            document.open();
+            // thêm nội dung sử dụng add function
+            document.add(new Paragraph(OutFile.removeAccent("Phiếu mượn trả")));
+            document.add(new Paragraph(OutFile.removeAccent("Mã Mượn Trả: " + tfmuontra.getText())));
+            document.add(new Paragraph(OutFile.removeAccent("Đọc Giả: " + tfdocgia.getText())));
+            document.add(new Paragraph(OutFile.removeAccent("Nhân Viên: " + tfnv.getText())));
+            document.add(new Paragraph(OutFile.removeAccent("Ngày Mượn: " + tfngaymuon.getText())));
+            document.add(new Paragraph(OutFile.removeAccent("Danh sách các sách đã mượn:")));
+            PdfPTable table = new PdfPTable(4);
+            PdfPCell header1 = new PdfPCell(new Paragraph(OutFile.removeAccent("Tên Sách")));
+            PdfPCell header2 = new PdfPCell(new Paragraph(OutFile.removeAccent("Số Lượng")));
+            PdfPCell header3 = new PdfPCell(new Paragraph(OutFile.removeAccent("Hạn Trả")));
+            PdfPCell header4 = new PdfPCell(new Paragraph(OutFile.removeAccent("Ngày Trả")));
+            table.addCell(header1);
+            table.addCell(header2);
+            table.addCell(header3);
+            table.addCell(header4);
+            ArrayList<chitietphieuDTO> ctp = chitietphieuBUS.getChiTietPhieu();
+            for (int i = 0; i < ctp.size(); i++) {
+                if (ctp.get(i).getMaMuonTra().equals(tfmuontra.getText())) {
+                    String tensach = sachBUS.getTenSach(ctp.get(i).getMaSach());
+                    PdfPCell data1 = new PdfPCell(new Paragraph(OutFile.removeAccent(tensach)));
+                    PdfPCell data2 = new PdfPCell(new Paragraph(ctp.get(i).getSoLuong()));
+                    PdfPCell data3 = new PdfPCell(new Paragraph(String.valueOf(ctp.get(i).getHanTra())));
+                    PdfPCell data4 = new PdfPCell(new Paragraph(String.valueOf(ctp.get(i).getNgayTra())));
+                    table.addCell(data1);
+                    table.addCell(data2);
+                    table.addCell(data3);
+                    table.addCell(data4);
+
+                }
+            }
+            document.add(table);
+            //Khởi tạo 3 ô header
+
+            //Thêm 3 ô header vào table
+            document.close();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PanelEmployees.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void buttonThemChiTietActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonThemChiTietActionPerformed
+        // TODO add your handling code here:
+        JFrame themchitiet = new JFrame();
+        themchitiet.setVisible(true);
+        //         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        //         themchitiet.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        themchitiet.setSize(1044, 768);
+        themchitiet.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                // your code
+                //                tftongtien.setText(chitietphieuphatBUS.getTongTien(tfphieuphat.getText().toString().trim())+"");
+
+            }
+        });
+        //          themchitiet.addWindowListener(new java.awt.event.WindowAdapter() {
+        //
+        //        @Override
+        //        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+        //          }
+        //    });
+        PanelLoanSlipDetails pb = new PanelLoanSlipDetails(tfmuontra.getText().trim(), 1);
+        pb.setBounds(0, 0, 1024, 768);
+        themchitiet.add(pb);
+    }//GEN-LAST:event_buttonThemChiTietActionPerformed
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        TableModel model = jTable1.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            phieumuontraDTO pmt = new phieumuontraDTO();
+            pmt.setMaDocGia(model.getValueAt(i, 1) + "");
+            pmt.setMaNhanVien(model.getValueAt(i, 2) + "");
+            try {
+                Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(model.getValueAt(i, 3) + "");
+                pmt.setNgayMuon(date1);
+            } catch (ParseException ex) {
+                Logger.getLogger(PanelLoanSlip.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            pmt.setGhiChu(model.getValueAt(i, 4) + "");
+            phieumuontraBUS.themPhieuMuonTra(pmt, this);
+        }
+        // TODO add your handling code here:
+        jButton16.setVisible(false);
+    }//GEN-LAST:event_jButton16ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        try {
+            // TODO add your handling code here:
+            jTable1.setModel(OutFile.readExcel("system\\database\\data\\loanslip.xls"));
+            jButton16.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(PanelLoanSlip.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButton13ActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonAdddocgia;
+    private javax.swing.JButton buttonAddnhanvien;
+    private javax.swing.JButton buttonThemChiTiet;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField jTextField9;
+    private javax.swing.JTextField tfdocgia;
+    private javax.swing.JTextField tfghichu;
+    private javax.swing.JTextField tfmuontra;
+    private javax.swing.JTextField tfngaymuon;
+    private javax.swing.JTextField tfnv;
+    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void onSuccess() {
+        loadPhieuMuon();
+    }
+
+    @Override
+    public void onFailed(String error) {
+
+    }
+
+    private void loadPhieuMuon() {
+        String[] header = {"Mã Mượn Trả", "Đọc Giả", "Nhân Viên", "Ngày Mượn", "Ghi Chú"};
+        dtm = new DefaultTableModel(header, 0);
+        arr = phieumuontraBUS.getPhieuMuonTra();
+        phieumuontraDTO pmt = new phieumuontraDTO();
+        for (int i = 0; i < arr.size(); i++) {
+            pmt = arr.get(i);
+            String mamt = pmt.getMaMuonTra();
+            String madg = pmt.getMaDocGia();
+            String tendg = docgiaBUS.getTenDocGia(madg);
+            arr.get(i).setTenDocGia(tendg);
+            String manv = pmt.getMaNhanVien();
+            String tennv = nhanvienBUS.getTenNhanVien(manv);
+            arr.get(i).setTenNhanVien(tennv);
+
+            Date ngaymuon = pmt.getNgayMuon();
+//            Date ngayhentra = pmt.getNgayTra();
+            String ghichu = pmt.getGhiChu();
+//            System.out.println("ngày hẹn trả" + ngayhentra);
+            Object[] row = {mamt, tendg, tennv, ngaymuon, ghichu};
+            dtm.addRow(row);
+        }
+        jTable1.setModel(dtm);
+        setView(arr.get(0));
+    }
+
+    public void setView(phieumuontraDTO pmt) {
+        if (jButton6.getText().equals("Thêm") && jButton8.getText().equals("Sửa")) {
+            tfmuontra.setText(pmt.getMaMuonTra() + "");
+            tfdocgia.setText(docgiaBUS.getTenDocGia(pmt.getMaDocGia()));
+            tfnv.setText(nhanvienBUS.getTenNhanVien(pmt.getMaNhanVien()));
+            tfngaymuon.setText(pmt.getNgayMuon().toString());
+//        jTextField5.setText(pmt.getNgayTra().toString());
+            tfghichu.setText(pmt.getGhiChu());
+
+            current.setMaDocGia(pmt.getMaDocGia());
+            current.setMaMuonTra(pmt.getMaMuonTra());
+            current.setMaNhanVien(pmt.getMaNhanVien());
+            current.setNgayMuon(pmt.getNgayMuon());
+        }
+
+    }
+
+    private void initData() {
+        tfghichu.setEnabled(false);
+        jButton16.setVisible(false);
+        current.setTenNhanVien(cons.nv.getTenNhanVien());
+        current.setMaNhanVien(cons.nv.getMaNV());
+        buttonThemChiTiet.setVisible(false);
+        tfdocgia.setEditable(false);
+        tfnv.setEditable(false);
+        tfngaymuon.setEditable(false);
+        tfmuontra.setEditable(false);
+        tfmuontra.setEditable(false);
+        jButton10.setVisible(false);
+        jPanel1.setVisible(false);
+        datePicker.setVisible(false);
+        datePicker2.setVisible(false);
+        datePickerngaymuon.setVisible(false);
+    }
+
+    private void initEvent() {
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                // do some actions here, for example
+                // print first column value from selected row
+                try {
+                    current.setMaDocGia(arr.get(jTable1.getSelectedRow()).getMaDocGia());
+                    current.setMaMuonTra(arr.get(jTable1.getSelectedRow()).getMaMuonTra());
+                    current.setMaNhanVien(arr.get(jTable1.getSelectedRow()).getMaNhanVien());
+                    current.setNgayMuon(arr.get(jTable1.getSelectedRow()).getNgayMuon());
+                    setView(arr.get(jTable1.getSelectedRow()));
+                } catch (Exception e) {
+                }
+            }
+        });
+        jTable1.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                JTable table = (JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    inChangePanelDeal.onChange(arr.get(jTable1.getSelectedRow()).getMaMuonTra());
+                }
+            }
+        });
+        jComboBox1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (jComboBox1.getSelectedItem().equals("Ngày Mượn") || jComboBox1.getSelectedItem().equals("Ngày Hẹn Trả")) {
+                    datePicker.setVisible(true);
+                    datePicker2.setVisible(true);
+                    jTextField7.setEditable(false);
+                    return;
+                }
+
+                jTextField7.setEditable(true);
+                datePicker.setVisible(false);
+                datePicker2.setVisible(false);
+
+            }
+        });
+    }
+
+    @Override
+    public void docgia(docgiaDTO tg) {
+        tfdocgia.setText(tg.getTenDocGia());
+        current.setMaDocGia(tg.getMaDocGia());
+        jPanel2.setVisible(true);
+        panelDg.setVisible(false);
+    }
+
+    @Override
+    public void nhanvien(nhanvienDTO tg) {
+        tfnv.setText(tg.getTenNhanVien());
+        current.setMaNhanVien(tg.getMaNV());
+        jPanel2.setVisible(true);
+        panelNv.setVisible(false);
+    }
+}
